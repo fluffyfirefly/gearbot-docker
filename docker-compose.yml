@@ -1,0 +1,42 @@
+version: '3'
+
+volumes:
+  db:
+  redis:
+
+networks:
+  default:
+
+services:
+  app:
+    image: fluffyfirefly/gearbot:latest
+    restart: unless-stopped
+    command:
+      - "python3"
+      - "./GearBot/GearBot.py"
+    depends_on:
+      - redis
+      - db
+    networks:
+      - default
+    volumes:
+      - ~/docker/gearbot/config:/app/config
+
+
+  redis:
+    image: redis
+    restart: unless-stopped
+    networks:
+      - default
+    volumes:
+      - redis:/data
+
+  db:
+    image: postgres:11
+    restart: unless-stopped
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - default
+    env_file:
+      - db.env
